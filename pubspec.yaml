@@ -7,10 +7,10 @@ environment:
   sdk: '>=2.18.4 <3.0.0'
 
 dependencies:
-  http:
+  # http:
   html:
   dart_console: 
-#   path: ^1.8.0
+  dio: 
 
 dev_dependencies:
   lints: ^2.0.0
