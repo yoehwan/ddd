@@ -9,7 +9,7 @@ environment:
 dependencies:
   http:
   html:
-
+  dart_console: 
 #   path: ^1.8.0
 
 dev_dependencies:
