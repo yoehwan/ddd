@@ -1,0 +1,1 @@
+class URLValidExection implements Exception {}
