@@ -11,8 +11,23 @@ class TerminalOnKey extends TerminalEvent {
   @override
   State onEvent(State state) {
     return state.copyWith(
-      status: Status.tapKey,
       pressedKey: key,
     );
   }
+}
+
+class TerminalOnTapCommand extends TerminalEvent {
+  TerminalOnTapCommand(this.command);
+  final String command;
+
+  @override
+  State onEvent(State state) {
+    return state.copyWith(
+      status: Status.runCommand,
+      commandText: command,
+    );
+  }
+
+  @override
+  List<Object?> get props => [command];
 }

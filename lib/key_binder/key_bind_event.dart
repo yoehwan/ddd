@@ -38,6 +38,34 @@ class KeyBindOnTapCommand extends KeyBindEvent {
   List<Object?> get props => [];
 }
 
+class KeyBindOnTapWeb extends KeyBindEvent {
+  @override
+  State onEvent(State state) {
+    return state.copyWith(
+      status: Status.web,
+    );
+  }
+
+  @override
+  List<Object?> get props => [];
+}
+
+class KeyBindOnRequestURL extends KeyBindEvent {
+  KeyBindOnRequestURL(this.url);
+  final String url;
+
+  @override
+  State onEvent(State state) {
+    return state.copyWith(
+      status: Status.request,
+      url: url,
+    );
+  }
+
+  @override
+  List<Object?> get props => [url];
+}
+
 // TODO: make it handle by offset.
 class KeyBindOnMoveCursor extends KeyBindEvent {
   KeyBindOnMoveCursor(this.key);
@@ -46,9 +74,9 @@ class KeyBindOnMoveCursor extends KeyBindEvent {
   @override
   State onEvent(State state) {
     return state.copyWith(
-      status: Status.moveCusor,
-      pressedKey: key,
-    );
+        // status: Status.moveCusor,
+        // pressedKey: key,
+        );
   }
 
   @override

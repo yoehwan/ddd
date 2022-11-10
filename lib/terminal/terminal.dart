@@ -6,6 +6,7 @@ import 'dart:isolate';
 
 import 'package:dart_console/dart_console.dart';
 import 'package:ddd/state_manager/state_manager.dart';
+
 part 'terminal_event.dart';
 
 final _console = Console();
@@ -32,61 +33,92 @@ class Terminal {
   }
 
   void _stateListener(State state) {
+    final previusStatus = state.previusStatus;
     final status = state.status;
-    final key = state.pressedKey;
     switch (status) {
-      case Status.init:
-        // TODO: Handle this case.
-        break;
-      case Status.help:
-        write("Help Text", clear: true);
-        break;
-      case Status.tapKey:
-        // TODO: Handle this case.
-        break;
-      case Status.exit:
-        dispose();
-        break;
-      case Status.moveCusor:
-        if (key == null) {
+      case Status.web:
+      case Status.runCommand:
+        _webView(state.webText);
+        return;
+      case Status.command:
+        if (previusStatus != status) {
+          _commandView();
           return;
         }
-        final arrow = key.controlChar;
-        switch (arrow) {
-          case ControlCharacter.arrowLeft:
-            _console.cursorLeft();
-            break;
-          case ControlCharacter.arrowUp:
-            _console.cursorUp();
-            break;
-          case ControlCharacter.arrowRight:
-            _console.cursorRight();
-            break;
-          case ControlCharacter.arrowDown:
-            _console.cursorDown();
-            break;
-          default:
-            break;
-        }
-        break;
-      case Status.command:
+        final key = state.pressedKey;
         if (key != null) {
-          _commandMode(key);
+          final char = key.char;
+          final controlChar = key.controlChar;
+          if (controlChar == ControlCharacter.enter) {
+            stateManager.add(TerminalOnTapCommand(_commandText));
+            return;
+          }
+          if (controlChar == ControlCharacter.backspace) {
+            // how Delete char on carrot?
+            return;
+          }
+          if (controlChar == ControlCharacter.arrowLeft) {
+            _console.cursorLeft();
+            return;
+          }
+          if (controlChar == ControlCharacter.arrowRight) {
+            _console.cursorRight();
+            return;
+          }
+          write(char);
+          _commandText += char;
         }
         return;
-    }
-    if (key != null) {
-      _console.write(key);
+      case Status.help:
+        _helpView();
+        return;
+      case Status.exit:
+        dispose();
+        return;
+      case Status.loading:
+        _loadingView();
+        break;
+      case Status.error:
+        final e = state.exception;
+        if (e != null) {
+          _errorView(e);
+        }
+        return;
+      case Status.search:
+      case Status.request:
+      case Status.render:
+        break;
     }
   }
 
-  void _commandMode(Key key) {
+  void _errorView(Exception exception) {
     _console.resetCursorPosition();
     final height = _console.windowHeight;
     for (int index = 0; index < height; index++) {
       _console.cursorDown();
     }
-    _console.write(":");
+    _console.setBackgroundColor(ConsoleColor.red);
+    _console.write(exception.toString());
+    _console.resetColorAttributes();
+  }
+
+  void _loadingView() {
+    write("Loading..", clear: true);
+  }
+
+  void _webView(String webText) {
+    write(webText, clear: true);
+  }
+
+  String _commandText = "";
+  void _commandView() {
+    _commandText = ":";
+    _console.resetCursorPosition();
+    final height = _console.windowHeight;
+    for (int index = 0; index < height; index++) {
+      _console.cursorDown();
+    }
+    write(":");
   }
 
   Future refresh([String? html]) async {
@@ -117,5 +149,9 @@ class Terminal {
   void _clearScreen() {
     _console.clearScreen();
     _console.resetCursorPosition();
+  }
+
+  void _helpView() {
+    write("Help Text", clear: true);
   }
 }
