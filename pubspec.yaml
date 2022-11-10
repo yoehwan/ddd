@@ -11,6 +11,7 @@ dependencies:
   html:
   dart_console: 
   dio: 
+  equatable: 
 
 dev_dependencies:
   lints: ^2.0.0
