@@ -2,32 +2,14 @@ part of terminal;
 
 abstract class TerminalEvent extends StateEvent {}
 
-class TerminalOnKey extends TerminalEvent {
-  TerminalOnKey(this.key);
-  final Key key;
-  @override
-  List<Object?> get props => [key];
-
+class TerminalOnWeb extends TerminalEvent {
   @override
   State onEvent(State state) {
     return state.copyWith(
-      pressedKey: key,
-    );
-  }
-}
-
-class TerminalOnTapCommand extends TerminalEvent {
-  TerminalOnTapCommand(this.command);
-  final String command;
-
-  @override
-  State onEvent(State state) {
-    return state.copyWith(
-      status: Status.runCommand,
-      commandText: command,
+      status: Status.web,
     );
   }
 
   @override
-  List<Object?> get props => [command];
+  List<Object?> get props => [];
 }

@@ -32,6 +32,7 @@ class State extends Equatable {
   final Exception? exception;
   final Key? pressedKey;
   final String commandText;
+
   @override
   List<Object?> get props => [
         document,

@@ -6,8 +6,12 @@ import 'dart:isolate';
 
 import 'package:dart_console/dart_console.dart';
 import 'package:ddd/state_manager/state_manager.dart';
+import 'package:ddd/terminal/view/help_view/help_view.dart';
+import 'package:ddd/terminal/view/loading_view/loading_view.dart';
+import 'package:ddd/terminal/view/web_view/web_view.dart';
 
 part 'terminal_event.dart';
+part 'view/terminal_view.dart';
 
 final _console = Console();
 void _spawnKeyListener(SendPort port) {
@@ -24,12 +28,7 @@ class Terminal {
   Stream<Key> get keyStream => _port.map((event) => event as Key);
   void init() {
     stateManager.stateStream.listen(_stateListener);
-    keyStream.listen(_keyListener);
     Isolate.spawn(_spawnKeyListener, _port.sendPort);
-  }
-
-  void _keyListener(Key key) {
-    stateManager.add(TerminalOnKey(key));
   }
 
   void _stateListener(State state) {
@@ -37,9 +36,12 @@ class Terminal {
     final status = state.status;
     switch (status) {
       case Status.web:
+        WebView(state.webText);
+    final position = _console.cursorPosition;
+    print(position);
+        break;
       case Status.runCommand:
-        _webView(state.webText);
-        return;
+        break;
       case Status.command:
         if (previusStatus != status) {
           _commandView();
@@ -47,47 +49,32 @@ class Terminal {
         }
         final key = state.pressedKey;
         if (key != null) {
-          final char = key.char;
-          final controlChar = key.controlChar;
-          if (controlChar == ControlCharacter.enter) {
-            stateManager.add(TerminalOnTapCommand(_commandText));
+          if (key.controlChar == ControlCharacter.backspace) {
+            backspace(state.commandText);
             return;
           }
-          if (controlChar == ControlCharacter.backspace) {
-            // how Delete char on carrot?
-            return;
-          }
-          if (controlChar == ControlCharacter.arrowLeft) {
-            _console.cursorLeft();
-            return;
-          }
-          if (controlChar == ControlCharacter.arrowRight) {
-            _console.cursorRight();
-            return;
-          }
-          write(char);
-          _commandText += char;
+          write(key.char);
         }
         return;
       case Status.help:
-        _helpView();
+        HelpView();
         return;
-      case Status.exit:
-        dispose();
-        return;
-      case Status.loading:
-        _loadingView();
-        break;
       case Status.error:
+        WebView(state.webText);
         final e = state.exception;
         if (e != null) {
           _errorView(e);
         }
         return;
       case Status.search:
+      case Status.loading:
       case Status.request:
       case Status.render:
+        LoadingView();
         break;
+      case Status.exit:
+        dispose();
+        return;
     }
   }
 
@@ -98,36 +85,17 @@ class Terminal {
       _console.cursorDown();
     }
     _console.setBackgroundColor(ConsoleColor.red);
-    _console.write(exception.toString());
+    _console.write(exception.toString().split("\n").first);
     _console.resetColorAttributes();
   }
 
-  void _loadingView() {
-    write("Loading..", clear: true);
-  }
-
-  void _webView(String webText) {
-    write(webText, clear: true);
-  }
-
-  String _commandText = "";
   void _commandView() {
-    _commandText = ":";
     _console.resetCursorPosition();
     final height = _console.windowHeight;
     for (int index = 0; index < height; index++) {
       _console.cursorDown();
     }
     write(":");
-  }
-
-  Future refresh([String? html]) async {
-    _clearScreen();
-    if (html == null) {
-      return;
-    }
-    _console.write(html);
-    _console.resetCursorPosition();
   }
 
   void write(
@@ -140,6 +108,11 @@ class Terminal {
     _console.write(text);
   }
 
+  void backspace(String commandText) {
+    final newCommand = commandText.substring(0, commandText.length );
+    print(newCommand);
+  }
+
   void dispose() {
     _clearScreen();
     _console.rawMode = false;
@@ -149,9 +122,5 @@ class Terminal {
   void _clearScreen() {
     _console.clearScreen();
     _console.resetCursorPosition();
-  }
-
-  void _helpView() {
-    write("Help Text", clear: true);
   }
 }

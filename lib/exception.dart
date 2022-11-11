@@ -3,10 +3,20 @@ abstract class DDDException implements Exception {
   final String message;
   @override
   String toString() {
-    return "DDDError : $message";
+    return "$runtimeType: $message";
   }
 }
 
 class DDDUnknownException extends DDDException {
-  DDDUnknownException():super("UnknownException");
+  DDDUnknownException() : super("Unknown Exception");
+}
+
+class DDDUnknownCommandException extends DDDException {
+  DDDUnknownCommandException(this.command)
+      : super("Unknown Command Exception : [$command]");
+  final String command;
+}
+
+class DDDConnectionException extends DDDException {
+  DDDConnectionException(super.message);
 }

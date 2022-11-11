@@ -1,5 +1,3 @@
-// import 'package:http/http.dart' as http;
-
 import 'package:ddd/exception.dart';
 import 'package:ddd/parser/parser_event.dart';
 import 'package:ddd/state_manager/state_manager.dart';
@@ -8,8 +6,6 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html;
 
 const httpStatusOK = 200;
-const urlRegex =
-    r'^((?:.|\n)*?)((http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)([-A-Z0-9.]+)(/[-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#/%=~_|!:‌​,.;]*)?)';
 
 class Parser {
   final StateManager stateManager = StateManager.instance();
@@ -28,33 +24,35 @@ class Parser {
       case Status.help:
       case Status.exit:
       case Status.error:
+      case Status.runCommand:
         break;
       case Status.request:
-        final url = state.url;
-        final document = await _fetchHtml(url);
-        if (document == null) {
-          return;
+        try {
+          final url = state.url;
+          final document = await _fetchHtml(url);
+          stateManager.add(ParserOnCompleted(document));
+          break;
+        } on Exception catch (e) {
+          stateManager.add(ParserOnError(e));
         }
-        stateManager.add(ParserOnCompleted(document));
-        break;
     }
   }
 
   final dio = Dio();
-  bool isURl(String url) {
-    return RegExp(urlRegex).hasMatch(url);
-  }
 
-  Future<Document?> _fetchHtml(String url) async {
-    final res = await dio.get(
-      url,
-      onReceiveProgress: (count, total) {},
-    );
-
-    if (res.statusCode == httpStatusOK) {
-      String htmlToParse = res.data;
-      return html.parse(htmlToParse);
+  Future<Document> _fetchHtml(String url) async {
+    try {
+      final res = await dio.get(
+        url,
+        onReceiveProgress: (count, total) {},
+      );
+      if (res.statusCode == httpStatusOK) {
+        String htmlToParse = res.data;
+        return html.parse(htmlToParse);
+      }
+      throw DDDConnectionException("${res.statusCode}, ${res.statusMessage}");
+    } catch (e) {
+      throw DDDConnectionException(e.toString());
     }
-    return null;
   }
 }

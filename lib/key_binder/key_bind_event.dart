@@ -2,6 +2,38 @@ part of key_binder;
 
 abstract class KeyBindEvent extends StateEvent {}
 
+class KeyBindOnException extends KeyBindEvent {
+  KeyBindOnException(this.exception);
+  final Exception exception;
+
+  @override
+  State onEvent(State state) {
+    return state.copyWith(
+      status: Status.error,
+      exception: exception,
+    );
+  }
+
+  @override
+  List<Object?> get props => [exception];
+}
+
+class KeyBindOnTapCommandKey extends KeyBindEvent {
+  KeyBindOnTapCommandKey(this.key);
+  final Key key;
+
+  @override
+  State onEvent(State state) {
+    return state.copyWith(
+      pressedKey: key,
+      commandText: state.commandText + key.char,
+    );
+  }
+
+  @override
+  List<Object?> get props => [key];
+}
+
 class KeyBindOnTapExit extends KeyBindEvent {
   @override
   State onEvent(State state) {
@@ -14,7 +46,7 @@ class KeyBindOnTapExit extends KeyBindEvent {
   List<Object?> get props => [];
 }
 
-class KeyBindOnTapHelp extends KeyBindEvent {
+class KeyBindOnHelp extends KeyBindEvent {
   @override
   State onEvent(State state) {
     return state.copyWith(
@@ -26,11 +58,24 @@ class KeyBindOnTapHelp extends KeyBindEvent {
   List<Object?> get props => [];
 }
 
-class KeyBindOnTapCommand extends KeyBindEvent {
+class KeyBindOnCommand extends KeyBindEvent {
   @override
   State onEvent(State state) {
     return state.copyWith(
       status: Status.command,
+      commandText: "",
+    );
+  }
+
+  @override
+  List<Object?> get props => [];
+}
+
+class KeyBindOnRunCommand extends KeyBindEvent {
+  @override
+  State onEvent(State state) {
+    return state.copyWith(
+      status: Status.runCommand,
     );
   }
 

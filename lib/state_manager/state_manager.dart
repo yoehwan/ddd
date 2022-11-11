@@ -3,7 +3,6 @@ library state_manager;
 import 'dart:async';
 
 import 'package:dart_console/dart_console.dart';
-import 'package:ddd/exception.dart';
 import 'package:equatable/equatable.dart';
 import 'package:html/dom.dart';
 
