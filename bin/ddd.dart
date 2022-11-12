@@ -13,10 +13,10 @@ Future<void> main(List<String> arguments) async {
   parser.init();
   final render = Render();
   render.init();
-  final terminal = Terminal();
-  terminal.init();
-  final keyBinder = KeyBinder(terminal.keyStream);
-  keyBinder.init();
+  // final terminal = Terminal();
+  // terminal.init();
+  // final keyBinder = KeyBinder(terminal.keyStream);
+  // keyBinder.init();
   final stateManager = StateManager.instance();
   stateManager.add(KeyBindOnRequestURL(url));
 }
