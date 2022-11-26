@@ -22,7 +22,7 @@ class StateManager {
 
   Stream<State> get stateStream => _stateStreamController.stream;
 
-  void add(StateEvent event) {
+  void addEvent(StateEvent event) {
     state = event.onEvent(state);
     _stateStreamController.add(state);
   }

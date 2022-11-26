@@ -32,6 +32,10 @@ class State extends Equatable {
   final Exception? exception;
   final Key? pressedKey;
   final String commandText;
+  final Console console = Console();
+
+  int get consoleWidth => console.windowWidth;
+  int get consoleHeight => console.windowHeight;
 
   @override
   List<Object?> get props => [

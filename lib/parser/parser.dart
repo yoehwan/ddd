@@ -30,10 +30,10 @@ class Parser {
         try {
           final url = state.url;
           final document = await _fetchHtml(url);
-          stateManager.add(ParserOnCompleted(document));
+          stateManager.addEvent(ParserOnCompleted(document));
           break;
         } on Exception catch (e) {
-          stateManager.add(ParserOnError(e));
+          stateManager.addEvent(ParserOnError(e));
         }
     }
   }

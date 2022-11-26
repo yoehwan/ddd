@@ -13,17 +13,17 @@ import 'package:ddd/terminal/view/web_view/web_view.dart';
 part 'terminal_event.dart';
 part 'view/terminal_view.dart';
 
-final _console = Console();
 void _spawnKeyListener(SendPort port) {
   while (true) {
-    final key = _console.readKey();
+    final StateManager stateManager = StateManager.instance();
+    final key = stateManager.state.console.readKey();
     port.send(key);
   }
 }
 
 class Terminal {
   final StateManager stateManager = StateManager.instance();
-
+  Console get _console => stateManager.state.console;
   final _port = ReceivePort();
   Stream<Key> get keyStream => _port.map((event) => event as Key);
   void init() {
@@ -37,8 +37,6 @@ class Terminal {
     switch (status) {
       case Status.web:
         WebView(state.webText);
-    final position = _console.cursorPosition;
-    print(position);
         break;
       case Status.runCommand:
         break;
@@ -109,7 +107,7 @@ class Terminal {
   }
 
   void backspace(String commandText) {
-    final newCommand = commandText.substring(0, commandText.length );
+    final newCommand = commandText.substring(0, commandText.length);
     print(newCommand);
   }
 

@@ -18,5 +18,5 @@ Future<void> main(List<String> arguments) async {
   // final keyBinder = KeyBinder(terminal.keyStream);
   // keyBinder.init();
   final stateManager = StateManager.instance();
-  stateManager.add(KeyBindOnRequestURL(url));
+  stateManager.addEvent(KeyBindOnRequestURL(url));
 }

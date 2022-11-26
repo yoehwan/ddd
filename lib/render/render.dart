@@ -12,33 +12,22 @@ class Render {
   void _stateListener(State state) {
     final status = state.status;
     switch (status) {
-      case Status.request:
-        // TODO: Handle this case.
-        break;
       case Status.render:
         final doc = state.document;
         if (doc != null) {
           final html = rendering(doc);
-          stateManager.add(RenderOnCompleted(html));
+          stateManager.addEvent(RenderOnCompleted(html));
         }
         break;
+      case Status.request:
       case Status.loading:
-        // TODO: Handle this case.
-        break;
       case Status.web:
-        // TODO: Handle this case.
-        break;
       case Status.command:
-        // TODO: Handle this case.
-        break;
       case Status.search:
-        // TODO: Handle this case.
-        break;
       case Status.help:
-        // TODO: Handle this case.
-        break;
       case Status.exit:
-        // TODO: Handle this case.
+      case Status.error:
+      case Status.runCommand:
         break;
     }
   }

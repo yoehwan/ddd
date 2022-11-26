@@ -21,10 +21,10 @@ class KeyBinder {
     final keyChar = key.char;
     if (key.controlChar == ControlCharacter.ctrlQ) {
       if (status != Status.web) {
-        stateManager.add(KeyBindOnTapWeb());
+        stateManager.addEvent(KeyBindOnTapWeb());
         return;
       }
-      stateManager.add(KeyBindOnTapExit());
+      stateManager.addEvent(KeyBindOnTapExit());
       return;
     }
     switch (status) {
@@ -35,20 +35,20 @@ class KeyBinder {
         break;
       case Status.web:
         if (keyChar == ":") {
-          stateManager.add(KeyBindOnCommand());
+          stateManager.addEvent(KeyBindOnCommand());
           return;
         }
         if (keyChar == "?") {
-          stateManager.add(KeyBindOnHelp());
+          stateManager.addEvent(KeyBindOnHelp());
           return;
         }
         break;
       case Status.command:
         if (key.controlChar == ControlCharacter.enter) {
-          stateManager.add(KeyBindOnRunCommand());
+          stateManager.addEvent(KeyBindOnRunCommand());
           return;
         }
-        stateManager.add(KeyBindOnTapCommandKey(key));
+        stateManager.addEvent(KeyBindOnTapCommandKey(key));
         break;
       case Status.runCommand:
         final commandText = state.commandText;
@@ -61,7 +61,7 @@ class KeyBinder {
         try {
           _runCommand(command, target);
         } on Exception catch (e) {
-          stateManager.add(KeyBindOnException(e));
+          stateManager.addEvent(KeyBindOnException(e));
         }
         return;
       case Status.search:
@@ -72,7 +72,7 @@ class KeyBinder {
 
   void _runCommand(String command, String target) {
     if (command == "G") {
-      stateManager.add(KeyBindOnRequestURL(target));
+      stateManager.addEvent(KeyBindOnRequestURL(target));
       return;
     }
     throw DDDUnknownCommandException(command);
